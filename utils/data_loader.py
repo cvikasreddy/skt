@@ -8,9 +8,7 @@ import numpy as np
 import pandas as pd
 from random import shuffle
 from tqdm import tqdm
-
-
-# In[2]:
+import random
 
 class SKTDataLoader(object):
     """
@@ -141,7 +139,7 @@ class SKTDataLoader(object):
             Splits data into train, valid, test sets
         """
         # Split the data into train, valid, test using a random data_indices
-        self.data_indices_path = self.base_path + '_data_indices.npy'
+        self.data_indices_path = self.base_path + '_data_indices_' + str(self.seq_length) + '.npy'
         if os.path.isfile(self.data_indices_path): # If the indices file is present => load 
             self.data_indices = np.load(self.data_indices_path)
         else: # Else create indices now and store
@@ -164,38 +162,67 @@ class SKTDataLoader(object):
     def reset_index(self, data_type='train'):
         self.cur_index[data_type] = 0
         
-    def decode_sentence(self, list_of_ids):
-        return [self.idx2word[x] for x in list_of_ids]
-        
-    def encode_sentence(self, sentence):
+    def prepend_to_sentence(self, list_of_ids):
+        """
+            Prepends a list of ids with a id that is not present and reverse the list of input words.
+        """
+        return [self.go_index]*(self.seq_length - len(list_of_ids)) + list_of_ids[::-1]
+    
+    def append_to_sentence(self, list_of_ids):
+        """
+            Appends a list of ids with a id that is not present.
+        """
+        return list_of_ids + [self.go_index]*(self.seq_length - len(list_of_ids))
+      
+    def encode_sentence(self, sentence, index):
         """
             Takes in a list of words and encodes them using word2id.
         """
-        return self.prepend_sentence([self.word2idx[x] for x in sentence])
+        if index == 0:
+            return self.prepend_to_sentence([self.word2idx[x] for x in sentence])
+        return self.append_to_sentence([self.word2idx[x] for x in sentence])
     
     def encode_batch(self, batch_data):
         batch_inp = []
         batch_outp = []
         for pair in batch_data:
-            batch_inp.append(self.encode_sentence(pair[0]))
-            batch_outp.append(self.encode_sentence(pair[1]))
+            batch_inp.append(self.encode_sentence(pair[0], 0))
+            batch_outp.append(self.encode_sentence(pair[1], 1))
         return batch_inp, batch_outp
-    
-    def prepend_sentence(self, list_of_ids):
-        """
-            Prepends a list of ids with a id that is not present.
-        """
-        return [self.go_index]*(self.seq_length - len(list_of_ids)) + list_of_ids
     
     def next_batch(self, data_type='train'):
         """
             Returns batch_data of size 'batch_size' and of corresponding 'data_type'
         """
         stop = False
-        if(self.cur_index[data_type] + self.batch_size > self.data_size):
-            self.reset_index(data_type = data_type)
-            stop = True
+        if data_type == 'train':
+            if(self.cur_index[data_type] + self.batch_size > self.train_size):
+                self.reset_index(data_type = data_type)
+                stop = True
+        if data_type == 'test':
+            if(self.cur_index[data_type] + self.batch_size > self.test_size):
+                self.reset_index(data_type = data_type)
+                stop = True
+        if data_type == 'valid':
+            if(self.cur_index[data_type] + self.batch_size > self.valid_size):
+                self.reset_index(data_type = data_type)
+                stop = True
         batch_data = self.data_set[data_type][self.cur_index[data_type] : self.cur_index[data_type] + self.batch_size]
         batch_data = self.encode_batch(batch_data)
+        self.cur_index[data_type] += self.batch_size
+                
+        return np.swapaxes(np.array(batch_data[0]), 0, 1), np.swapaxes(np.array(batch_data[1]), 0, 1)
+    
+    def random_batch(self, data_type='train'):
+
+        if data_type == 'train':
+            temp_index = random.randint(0, self.train_size-self.batch_size-1)
+        if data_type == 'test':
+            temp_index = random.randint(0, self.test_size-self.batch_size-1)
+        if data_type == 'valid':
+            temp_index = random.randint(0, self.valid_size-self.batch_size-1)
         
+        batch_data = self.data_set[data_type][temp_index : temp_index + self.batch_size]
+        batch_data = self.encode_batch(batch_data)
+               
         return np.swapaxes(np.array(batch_data[0]), 0, 1), np.swapaxes(np.array(batch_data[1]), 0, 1)

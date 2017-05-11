@@ -11,26 +11,27 @@ import random
 from tensorflow.python.ops import rnn_cell, seq2seq
 from utils.data_loader import SKTDataLoader
 
-import os
-os.environ["CUDA_VISIBLE_DEVICES"]=""
+#import os
+#os.environ["CUDA_VISIBLE_DEVICES"]=""
 
 
 # In[2]:
 
 num_layers = 1   # Number of layers of RNN
-num_hidden = 128 # Hidden size of RNN cell
-batch_size = 64 
+num_hidden = 128  # Hidden size of RNN cell
+batch_size = 64  # Number of sentences in a batch
 seq_length = 50  # Length of sequence
-num_outputs = 2  
-learning_rate = 0.0001
+split = [0.90, 0.05, 0.05] # Splitting proportions into train, valid, test
+learning_rate = 0.001
 num_epochs = 10
+verbose = 1      # Display every <verbose> epochs
 
 model_name = 'skt'
 
 
 # In[3]:
 
-data_loader = SKTDataLoader('data/input_complete_split.txt', 'data/output_complete_split.txt',batch_size,seq_length)
+data_loader = SKTDataLoader('data/input_complete_100_split.txt','data/output_complete_100_split.txt',batch_size,seq_length, split=split)
 vocab_size =  data_loader.vocab_size   # Number of unique words in dataset
 
 data_size = data_loader.data_size      # Number of paris in the entire dataset
@@ -119,31 +120,31 @@ sess.run(init)
 
 # In[ ]:
 
-test_losses = []
+# test_losses = []
 
-# Testing on test set
-for i in range(num_test_batches):
-    batch_inp, batch_outp = data_loader.next_batch(data_type='test')
+# # Testing on test set
+# for i in range(num_test_batches):
+#     batch_inp, batch_outp = data_loader.next_batch(data_type='test')
 
-    input_dict = {encode_input[t]: batch_inp[t] for t in range(seq_length)}
-    input_dict.update({labels[t]: batch_outp[t] for t in range(seq_length)})
-    input_dict[keep_prob] = 1.0
+#     input_dict = {encode_input[t]: batch_inp[t] for t in range(seq_length)}
+#     input_dict.update({labels[t]: batch_outp[t] for t in range(seq_length)})
+#     input_dict[keep_prob] = 1.0
 
-    loss_val = sess.run(loss, feed_dict=input_dict)
-    test_losses.append(loss_val)
+#     loss_val = sess.run(loss, feed_dict=input_dict)
+#     test_losses.append(loss_val)
 
 
-log_txt = "Test_loss: " + str(round(np.mean(test_losses), 4)) + '+' + str(round(np.std(test_losses), 2)) 
-print log_txt
+# log_txt = "Test_loss: " + str(round(np.mean(test_losses), 4)) + '+' + str(round(np.std(test_losses), 2)) 
+# print log_txt
 
-f = open('log.txt', 'a')
-f.write(log_txt + '\n')
-f.close()
+# f = open('log.txt', 'a')
+# f.write(log_txt + '\n')
+# f.close()
 
 
 # ### Getting output and analysing
 
-# 1. get batch data like batch_q1, batch_q2
+# 1. get batch data like batch_inp, batch_outp
 # 2. get outputs from decode_outputs_test and argmax
 # 3. use swapaxes to change it to [batch_size, seq_length] for all batch_q1, batch_q2, output
 # 4. use data_loader.idx2word to generate words for all batch_q1, batch_q2, output
@@ -173,9 +174,9 @@ gens = np.swapaxes(decoded_outputs, 0, 1)
 
 index = random.randint(0, batch_size-1)
 
-inp = ''.join([data_loader.idx2word[x] for x in inps[index] if x != 14681]).replace('\xe2\x96\x81', ' ')
-outp = ''.join([data_loader.idx2word[x] for x in outps[index] if x != 14681]).replace('\xe2\x96\x81', ' ')
-gen = ''.join([data_loader.idx2word[x] for x in gens[index] if x != 14681]).replace('\xe2\x96\x81', ' ')
+inp = ''.join([data_loader.idx2word[x] for x in inps[index] if x != vocab_size-1]).replace('\xe2\x96\x81', ' ')
+outp = ''.join([data_loader.idx2word[x] for x in outps[index] if x != vocab_size-1][::-1]).replace('\xe2\x96\x81', ' ')
+gen = ''.join([data_loader.idx2word[x] for x in gens[index] if x != vocab_size-1][::-1]).replace('\xe2\x96\x81', ' ')
 
 
 # In[14]:
@@ -187,7 +188,8 @@ print outp
 # In[15]:
 
 print gen
-
+print
+print
 
 # #### Inputting the previous word for decoder
 
@@ -217,9 +219,9 @@ gens = np.swapaxes(decoded_outputs, 0, 1)
 
 index = random.randint(0, batch_size-1)
 
-inp = ''.join([data_loader.idx2word[x] for x in inps[index] if x != 14681]).replace('\xe2\x96\x81', ' ')
-outp = ''.join([data_loader.idx2word[x] for x in outps[index] if x != 14681]).replace('\xe2\x96\x81', ' ')
-gen = ''.join([data_loader.idx2word[x] for x in gens[index] if x != 14681]).replace('\xe2\x96\x81', ' ')
+inp = ''.join([data_loader.idx2word[x] for x in inps[index] if x != vocab_size-1]).replace('\xe2\x96\x81', ' ')
+outp = ''.join([data_loader.idx2word[x] for x in outps[index] if x != vocab_size-1]).replace('\xe2\x96\x81', ' ')
+gen = ''.join([data_loader.idx2word[x] for x in gens[index] if x != vocab_size-1]).replace('\xe2\x96\x81', ' ')
 
 
 # In[19]:
