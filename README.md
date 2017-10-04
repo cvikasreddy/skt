@@ -1,5 +1,4 @@
-# skt
-Sanskrit compound segmentation using seq2seq model 
+# Sanskrit compound segmentation using seq2seq model 
 Code for the paper titled 'Building a Word Segmenter for Sanskrit Overnight'
 
 Instructions
