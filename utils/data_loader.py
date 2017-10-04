@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 from random import shuffle
-from tqdm import tqdm
+#from tqdm import tqdm
 import random
 
 class SKTDataLoader(object):
@@ -67,7 +67,7 @@ class SKTDataLoader(object):
             return complete_data
             
         complete_data = []  
-        for inp, outp in tqdm(zip(self.input_data, self.output_data)):
+        for inp, outp in zip(self.input_data, self.output_data):
             inp = inp.split()
             outp = outp.split()
             complete_data.append([inp, outp])
@@ -81,8 +81,10 @@ class SKTDataLoader(object):
         """
         idx2word = {}
         word2idx = {}
-        word2idx_path = self.base_path + '_word2idx.npy'
-        idx2word_path = self.base_path + '_idx2word.npy'
+        #word2idx_path = self.base_path + '_word2idx.npy'
+        word2idx_path = 'data/dcs_data_input_train_sent_word2idx.npy'
+        #idx2word_path = self.base_path + '_idx2word.npy'
+        idx2word_path = 'data/dcs_data_input_train_sent_idx2word.npy'
         
         if os.path.isfile(word2idx_path) and os.path.isfile(idx2word_path): # If the vocab file is present => load and return only list of words
             word2idx = np.load(word2idx_path).item()
@@ -90,7 +92,7 @@ class SKTDataLoader(object):
             print "Loaded word2idx and idx2word"
             return idx2word, word2idx
         
-        for i, word in tqdm(enumerate(self.vocab_dict)):
+        for i, word in enumerate(self.vocab_dict):
             word2idx[word] = i
             idx2word[i] = word
         np.save(word2idx_path, word2idx)
@@ -103,7 +105,8 @@ class SKTDataLoader(object):
             Creates a dict vocab, which has all words and their occurence counts.
             Returns the list of all words in the dataset in alphabetical order.
         """
-        self.vocab_path = self.base_path + '_vocab.npy'
+        #self.vocab_path = self.base_path + '_vocab.npy'
+        self.vocab_path = 'data/dcs_data_input_train_sent_vocab.npy'
         if os.path.isfile(self.vocab_path): # If the vocab file is present => load and return only list of words
             vocab = np.load(self.vocab_path)
             vocab_list = vocab.item().keys()
@@ -111,7 +114,7 @@ class SKTDataLoader(object):
             print "Loaded vocab"
             return vocab_list
         vocab = {}
-        for inp, outp in tqdm(self.complete_data): # uses all the data to create vocab
+        for inp, outp in self.complete_data: # uses all the data to create vocab
             words = inp + outp
             for word in words:
                 if word in vocab.keys():
