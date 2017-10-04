@@ -45,3 +45,7 @@ Also, create another file with ground truth outputs again tokenized with sentenc
 If you only intend to get the output from the model and not compare it with your ground truth data, then keep an empty file with same number of lines as the input data file.
 
 Then modify the test.py with the appropriate path and run it.
+
+Contact
+--------
+If you face any problem running the code or have any suggestions please open an issue or mail me at vikas.challaram@gmail.com
