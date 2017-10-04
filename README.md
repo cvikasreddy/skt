@@ -7,7 +7,7 @@ Instructions
 Pre-requisites
 --------------
 The following python packages are required to be installed:
-* Tensorflow: https://www.tensorflow.org/
+* Tensorflow: https://www.tensorflow.org/, tensorflow version 0.12.1 was used for this project. 
 
 File organization
 -------------------------------------------
