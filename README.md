@@ -41,5 +41,7 @@ Once the train.py file is run, it creates various other files for word2id, id2wo
 Testing on other data
 -------------------------------------------
 To test on your your own data, create a file with all the sentences that are to segmented, one sentence per line and run the unsupervised segmenter(sentencepiece) using the m.vocab and m.model files present in the utils/ folder.
+Also, create another file with ground truth outputs again tokenized with sentencepiece.
+If you only intend to get the output from the model and not compare it with your ground truth data, then keep an empty file with same number of lines as the input data file.
 
 Then modify the test.py with the appropriate path and run it.
