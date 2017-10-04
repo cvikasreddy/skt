@@ -29,9 +29,11 @@ All the .txt files are already tokenized using sentencepiece, the m.vocab and m.
 All .txt files contain data which are separeted by a new line(\n).
 
 ### Training data: 
-dcs_data_input_train_sent.txt file contains the input sentences used for training. dcs_data_output_train_sent.txt file contains the output words(segmented forms of input) used for training.
+* dcs_data_input_train_sent.txt file contains the input sentences used for training. 
+* dcs_data_output_train_sent.txt file contains the output words(segmented forms of input) used for training.
 
 ### Testing data: 
-dcs_data_input_test_sent.txt file contains the input sentences used for testing. dcs_data_output_test_sent.txt file contains the output words(segmented forms of input) used for testing.
+* dcs_data_input_test_sent.txt file contains the input sentences used for testing. 
+* dcs_data_output_test_sent.txt file contains the output words(segmented forms of input) used for testing.
 
 Once the train.py file is run, it creates various other files for word2id, id2word, ... more details are provided in the utils/data_loader.py file.
