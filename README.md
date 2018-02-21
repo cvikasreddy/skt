@@ -1,5 +1,5 @@
 # Sanskrit compound segmentation using seq2seq model 
-Code for the paper titled 'Building a Word Segmenter for Sanskrit Overnight'
+Code for the paper titled ['Building a Word Segmenter for Sanskrit Overnight'](https://arxiv.org/abs/1802.06185)
 
 Instructions
 ============
